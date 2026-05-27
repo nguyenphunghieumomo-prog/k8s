@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiến Thức Tổng Hợp - Lộ Trình Học Kubernetes</title>
+    <style>
+        :root {
+            --bg-header: #141916;
+            --bg-sidebar: #f8f9fa;
+            --bg-content: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --accent-color: #0d6efd;
+            --border-color: #dee2e6;
+            --tag-bg: #e7f1ff;
+            --tag-text: #0d6efd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--bg-header);
+            color: #ffffff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #2ecc71;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #2ecc71;
+        }
+
+        .updated-date {
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 15px;
+            color: #bdc3c7;
+        }
+
+        /* Layout Container */
+        .container {
+            display: flex;
+            margin-top: 58px;
+            flex: 1;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 58px;
+            bottom: 0;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .topic-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+
+        .topic-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-item {
+            margin-bottom: 8px;
+        }
+
+        .menu-link {
+            display: block;
+            padding: 10px 12px;
+            color: #495057;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .menu-link:hover {
+            background-color: #e9ecef;
+            color: #000;
+        }
+
+        .menu-link.active {
+            background-color: #e7f1ff;
+            color: var(--accent-color);
+            font-weight: 600;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 6px 6px 0;
+        }
+
+        /* Main Content Area */
+        main {
+            margin-left: 320px;
+            flex: 1;
+            padding: 40px;
+            background-color: var(--bg-content);
+            max-width: 1000px;
+        }
+
+        /* CSS QUAN TRỌNG: Ẩn tất cả các section mặc định, chỉ hiện khi có class active */
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .block-header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        .block-title {
+            font-size: 22px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 20px 0 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Theory Box Styling */
+        .theory-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 15px;
+        }
+
+        .theory-box.advanced {
+            border-left-color: #e67e22;
+            background-color: #fffaf5;
+        }
+
+        .theory-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .theory-desc {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        /* Lab Card Styling */
+        .lab-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .lab-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .tag-basic { background-color: #e1f5fe; color: #0288d1; }
+        .tag-adv { background-color: #fbe9e7; color: #d84315; }
+
+        .lab-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .lab-text {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .roadmap-footer {
+            margin-top: 60px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            aside { width: 100%; position: relative; top: 0; bottom: auto; }
+            main { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Kiến Thức <span>Tổng Hợp</span></div>
+        <div class="updated-date">Cập nhật: 18/03/2026</div>
+    </header>
+
+    <div class="container">
+        <aside>
+            <div class="topic-title">Kubernetes Roadmap</div>
+            <div class="topic-subtitle">Hệ thống hóa kiến thức K8s từ Cơ bản đến Vận hành</div>
+            <ul class="menu-list">
+                <li class="menu-item"><a class="menu-link active" data-target="khoi1">⬛ Khối 1: Container & K8s Basics</a></li>
+                <li class="menu-item"><a class="menu-link" data-target="khoi2">🟧 Khối 2: Apps & Controllers</a></li>
+                <li class="menu-item"><a class="menu-link" data-target="khoi3">🟨 Khối 3: Services & Networking</a></li>
+                <li class="menu-item"><a class="menu-link" data-target="khoi4">🟩 Khối 4: Storage & Volumes</a></li>
+                <li class="menu-item"><a class="menu-link" data-target="khoi5">🟦 Khối 5: Config & Security</a></li>
+                <li class="menu-item"><a class="menu-link" data-target="khoi6">🟪 Khối 6: Resource & Scheduling</a></li>
+                <li class="menu-item"><a class="menu-link" data-target="khoi7">🟫 Khối 7: Autoscaling & Metrics</a></li>
+                <li class="menu-item"><a class="menu-link" data-target="khoi8">⬛ Khối 8: CI/CD, GitOps & Ops</a></li>
+            </ul>
+        </aside>
+
+        <main>
+            
+            <section id="khoi1" class="content-section active">
+                <div class="block-header">
+                    <div class="block-title">⬛ KHỐI 1: CONTAINER & KUBERNETES BASICS (Nền móng)</div>
+                </div>
+                <div class="section-subtitle">1. Lý thuyết</div>
+                <div class="theory-box">
+                    <div class="theory-title">Cơ bản (Containers & Introduction)</div>
+                    <div class="theory-desc">Phân biệt rõ ràng Ảo hóa (VM) và Container (Namespace, Cgroups, Layered File System). Hiểu quy trình build, tối ưu dung lượng Image (Multi-stage build) và quản lý Docker Registry. Nắm vững bản chất của Pod: Đơn vị nhỏ nhất, cơ chế chia sẻ Network Namespace và Storage giữa các container trong cùng một Pod.</div>
+                </div>
+                <div class="theory-box advanced">
+                    <div class="theory-title">Chuyên sâu (Kubernetes Concepts)</div>
+                    <div class="theory-desc">Kiến trúc Control Plane internals: Cách API Server giao tiếp qua etcd, cơ chế hoạt động của Khóa lạc quan (Optimistic Concurrency Control) trong etcd. Giao diện CRI (Container Runtime Interface): Cách K8s điều khiển containerd hoặc CRI-O tại tầng OS.</div>
+                </div>
+                <div class="section-subtitle">2. Chuỗi Bài Lab Thực Hành</div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-basic">Lab 1.1 - Cơ bản</div>
+                    <div class="lab-title">Build & Optimize Application Image</div>
+                    <div class="lab-text">Build một Docker image chạy ứng dụng Node.js/Python tối ưu dung lượng &lt; 50MB sử dụng Multi-stage build và đẩy lên Docker Hub.</div>
+                </div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-adv">Lab 1.2 - Nâng cao</div>
+                    <div class="lab-title">Multi-container Pod (Sidecar Pattern)</div>
+                    <div class="lab-text">Tạo một Pod chạy dạng Multi-container gồm 1 container App chính và 1 container Log-shipper dạng Sidecar chia sẻ chung thư mục lưu log qua volume chung.</div>
+                </div>
+            </section>
+
+            <section id="khoi2" class="content-section">
+                <div class="block-header">
+                    <div class="block-title">🟧 KHỐI 2: RUNNING APPLICATIONS & CONTROLLERS</div>
+                </div>
+                <div class="section-subtitle">1. Lý thuyết</div>
+                <div class="theory-box">
+                    <div class="theory-title">Cơ bản (Deployments & ReplicaSets)</div>
+                    <div class="theory-desc">Cách Deployment điều khiển ReplicaSet, ReplicaSet quản lý Pod bằng cơ chế Loop Control (Vòng lặp kiểm soát). Phân biệt Stateless (Deployment) và Stateful (StatefulSet): Tại sao StatefulSet lại định danh Pod theo số thứ tự cố định (pod-0, pod-1).</div>
+                </div>
+                <div class="theory-box advanced">
+                    <div class="theory-title">Chuyên sâu (Rolling Updates & Internals)</div>
+                    <div class="theory-desc">Thuật toán cập nhật RollingUpdate: Hiểu sâu hai thông số maxSurge (số Pod vượt mức tối đa) và maxUnavailable (số Pod chết tối đa cho phép) để tối ưu hóa không gián đoạn hệ thống. Cơ chế định vị và dọn dẹp tài nguyên rác (Garbage Collection / Owner References) khi xóa một Deployment.</div>
+                </div>
+                <div class="section-subtitle">2. Chuỗi Bài Lab Thực Hành</div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-basic">Lab 2.1 - Cơ bản</div>
+                    <div class="lab-title">StatefulSet Deployment (Redis/PostgreSQL)</div>
+                    <div class="lab-text">Triển khai một StatefulSet (Ví dụ: Redis hoặc PostgreSQL) để thấy sự khác biệt về cách đặt tên, định danh Pod ổn định so với Deployment Nginx thông thường.</div>
+                </div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-adv">Lab 2.2 - Nâng cao</div>
+                    <div class="lab-title">RollingUpdate Rollback Trận Đánh Thực Tế</div>
+                    <div class="lab-text">Thực hiện cập nhật RollingUpdate từ App v1 lên v2, cố tình cấu hình sai lỗi Image ở v2 để học cách sử dụng lệnh <code>kubectl rollout undo</code> cứu nguy hệ thống ngay lập tức.</div>
+                </div>
+            </section>
+
+            <section id="khoi3" class="content-section">
+                <div class="block-header">
+                    <div class="block-title">🟨 KHỐI 3: SERVICES & NETWORKING (Mạng lưới)</div>
+                </div>
+                <div class="section-subtitle">1. Lý thuyết</div>
+                <div class="theory-box">
+                    <div class="theory-title">Cơ bản (Service Types & CoreDNS)</div>
+                    <div class="theory-desc">Cách K8s CoreDNS phân giải tên miền nội bộ dạng <code>[service-name].[namespace].svc.cluster.local</code>. Phân biệt rõ ràng 3 loại Service chính: ClusterIP (Nội bộ), NodePort (Mở cổng máy vật lý) và LoadBalancer (Tích hợp Cloud Provider).</div>
+                </div>
+                <div class="theory-box advanced">
+                    <div class="theory-title">Chuyên sâu (kube-proxy & Ingress Controller)</div>
+                    <div class="theory-desc">Bản chất của Service: Service không phải một thực thể phần mềm chạy ngầm, nó chỉ là các quy tắc điều hướng mạng (Routing Rules) được cấu hình bởi kube-proxy thông qua IPVS hoặc IPTables trên từng Node. Cơ chế hoạt động của Ingress Controller (Nginx/Traefik) hoạt động ở Layer 7 (HTTP/HTTPS) để định tuyến request dựa vào Header/Host.</div>
+                </div>
+                <div class="section-subtitle">2. Chuỗi Bài Lab Thực Hành</div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-basic">Lab 3.1 - Cơ bản</div>
+                    <div class="lab-title">ExternalName Service Routing</div>
+                    <div class="lab-text">Cấu hình Service dạng ExternalName để Pod bên trong K8s gọi ra một Database nằm ngoài cụm K8s (như Cloud RDS) một cách trong suốt.</div>
+                </div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-adv">Lab 3.2 - Nâng cao</div>
+                    <div class="lab-title">Ingress Controller Multi-host Routing</div>
+                    <div class="lab-text">Cài đặt Nginx Ingress Controller lên cụm K3s. Cấu hình trỏ hai tên miền app1.com và app2.com về chung một IP duy nhất của Ingress nhưng dẫn vào 2 dịch vụ K8s khác nhau.</div>
+                </div>
+            </section>
+
+            <section id="khoi4" class="content-section">
+                <div class="block-header">
+                    <div class="block-title">🟩 KHỐI 4: STORAGE & VOLUMES (Lưu trữ dữ liệu)</div>
+                </div>
+                <div class="section-subtitle">1. Lý thuyết</div>
+                <div class="theory-box">
+                    <div class="theory-title">Cơ bản (Volumes & Claims)</div>
+                    <div class="theory-desc">Vòng đời lưu trữ: Sự khác nhau giữa EmptyDir (Xóa khi Pod chết) và HostPath (Gắn vào thư mục máy Worker). Chuẩn hóa lưu trữ: Khái niệm PersistentVolume (PV - Ổ cứng vật lý do Admin tạo) và PersistentVolumeClaim (PVC - Yêu cầu xin cấp ổ cứng từ Developer).</div>
+                </div>
+                <div class="theory-box advanced">
+                    <div class="theory-title">Chuyên sâu (CSI & Access Modes)</div>
+                    <div class="theory-desc">Cơ chế Tự động cấp phát ổ đĩa (Dynamic Provisioning) thông qua StorageClass và các driver CSI (Container Storage Interface). Các chế độ truy cập ổ đĩa: ReadWriteOnce (RWO - 1 Node đọc ghi), ReadOnlyMany (ROX), và ReadWriteMany (RWX - Nhiều Node đọc ghi đồng thời như NFS/Ceph).</div>
+                </div>
+                <div class="section-subtitle">2. Chuỗi Bài Lab Thực Hành</div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-basic">Lab 4.1 - Cơ bản</div>
+                    <div class="lab-title">Dynamic Provisioning with MySQL</div>
+                    <div class="lab-text">Tạo một StorageClass dạng Local-Path, viết file định nghĩa PVC để cấp một ổ đĩa 5GB gắn trực tiếp vào thư mục dữ liệu <code>/var/lib/mysql</code> của Pod MySQL.</div>
+                </div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-adv">Lab 4.2 - Nâng cao</div>
+                    <div class="lab-title">Data Persistence Validation (WordPress Test)</div>
+                    <div class="lab-text">Kiểm chứng tính bất tử dữ liệu: Cài đặt WordPress lưu trữ qua PVC, tạo bài viết nháp, chủ động xoá sạch cả Pod WordPress và MySQL, chờ Pod mới phục hồi và kiểm tra dữ liệu cũ.</div>
+                </div>
+            </section>
+
+            <section id="khoi5" class="content-section">
+                <div class="block-header">
+                    <div class="block-title">🟦 KHỐI 5: CONFIGURATION & SECURITY (Bảo mật)</div>
+                </div>
+                <div class="section-subtitle">1. Lý thuyết</div>
+                <div class="theory-box">
+                    <div class="theory-title">Cơ bản (Config & Secrets, RBAC)</div>
+                    <div class="theory-desc">Bảo mật dữ liệu nhạy cảm: Phân biệt ConfigMap (Dữ liệu cấu hình thường) và Secret (Dữ liệu mã hóa Base64 như Password, Token, TLS Certificate). Cơ chế phân quyền RBAC: Mối quan hệ giữa User/ServiceAccount (Ai?), Role/ClusterRole (Được làm gì?) và RoleBinding (Gắn quyền).</div>
+                </div>
+                <div class="theory-box advanced">
+                    <div class="theory-title">Chuyên sâu (NetworkPolicy & Hot-reload)</div>
+                    <div class="theory-desc">Cơ chế tự động cập nhật (Hot-reload) của ứng dụng bên trong Container khi ta cập nhật file cấu hình ConfigMap/Secret. Sử dụng NetworkPolicy để thiết lập tường lửa tầng K8s: Chặn không cho các Pod thuộc Namespace Testing kết nối sang Namespace Production.</div>
+                </div>
+                <div class="section-subtitle">2. Chuỗi Bài Lab Thực Hành</div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-basic">Lab 5.1 - Cơ bản</div>
+                    <div class="lab-title">Securing MySQL Credentials via Secrets</div>
+                    <div class="lab-text">Chuyển đổi toàn bộ cấu hình mật khẩu dạng văn bản thô (Plain-text) của bài Lab MySQL/WordPress sang dạng bảo mật sử dụng K8s Secrets.</div>
+                </div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-adv">Lab 5.2 - Nâng cao</div>
+                    <div class="lab-title">RBAC Authorization & ServiceAccount</div>
+                    <div class="lab-text">Tạo một ServiceAccount giới hạn quyền, chỉ cho phép thực hiện hành vi xem (get, list) Pod ở duy nhất namespace default, chặn toàn bộ quyền xóa hay can thiệp namespace khác.</div>
+                </div>
+            </section>
+
+            <section id="khoi6" class="content-section">
+                <div class="block-header">
+                    <div class="block-title">🟪 KHỐI 6: RESOURCE MANAGEMENT & SCHEDULING</div>
+                </div>
+                <div class="section-subtitle">1. Lý thuyết</div>
+                <div class="theory-box">
+                    <div class="theory-title">Cơ bản (Requests, Limits & OOMKilled)</div>
+                    <div class="theory-desc">Bản chất kỹ thuật của Requests (Điều kiện cần để xếp lịch lên Node) và Limits (Hạn mức tối đa được dùng tài nguyên) cho CPU và RAM. Hiểu sâu về cơ chế OOMKilled (Out of Memory) khi Pod sử dụng vượt quá giới hạn giới hạn RAM cho phép.</div>
+                </div>
+                <div class="theory-box advanced">
+                    <div class="theory-title">Chuyên sâu (Advanced Scheduling)</div>
+                    <div class="theory-desc">Cơ chế tính toán của <code>kube-scheduler</code>: Giai đoạn Lọc (Filtering) các Node đủ điều kiện và Giai đoạn Chấm điểm (Scoring) các Node tối ưu nhất. Điều khiển Pod chạy theo ý muốn qua: NodeSelector, NodeAffinity (Hút Pod về Node), Taints and Tolerations (Đẩy Pod không thích hợp ra khỏi Node).</div>
+                </div>
+                <div class="section-subtitle">2. Chuỗi Bài Lab Thực Hành</div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-basic">Lab 6.1 - Cơ bản</div>
+                    <div class="lab-title">Resource Limit & OOMKilled Simulation</div>
+                    <div class="lab-text">Thiết lập giới hạn tài nguyên cho Pod Nginx (limits: 128Mi RAM). Viết một đoạn script chạy benchmark ép Pod ngốn RAM vượt quá 128Mi để chứng kiến K8s kích hoạt cơ chế Kill Pod thực tế.</div>
+                </div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-adv">Lab 6.2 - Nâng cao</div>
+                    <div class="lab-title">Taints and Tolerations Node Targeting</div>
+                    <div class="lab-text">Sử dụng Taints gắn lên máy k8s-worker-03 để biến nó thành một Node chuyên biệt (Ví dụ máy có GPU/SSD cao cấp), sau đó viết file YAML Pod có cấu hình Tolerations để chỉ định Pod này nhảy vào worker-03.</div>
+                </div>
+            </section>
+
+            <section id="khoi7" class="content-section">
+                <div class="block-header">
+                    <div class="block-title">🟫 KHỐI 7: AUTOSCALING & OBSERVABILITY</div>
+                </div>
+                <div class="section-subtitle">1. Lý thuyết</div>
+                <div class="theory-box">
+                    <div class="theory-title">Cơ bản (HPA & Metrics)</div>
+                    <div class="theory-desc">Tự động mở rộng theo tải: Cơ chế hoạt động của HPA (Horizontal Pod Autoscaler) dựa vào Metric Server (CPU/RAM tăng cao thì tự nhân bản thêm Pod). Giám sát hệ thống: Mô hình thu thập dữ liệu dạng Pull (Prometheus) và đẩy dữ liệu trực quan lên Dashboard (Grafana).</div>
+                </div>
+                <div class="theory-box advanced">
+                    <div class="theory-title">Chuyên sâu (VPA & EFK Logging Architecture)</div>
+                    <div class="theory-desc">Autoscaling nâng cao: Phân biệt HPA (tăng số lượng Pod) và VPA (tăng kích thước CPU/RAM của chính Pod đó). Đọc hiểu và phân tích sâu cấu trúc Log của hệ thống K8s thông qua kiến trúc quản lý tập trung như EFK Stack (Elasticsearch, Fluentd, Kibana).</div>
+                </div>
+                <div class="section-subtitle">2. Chuỗi Bài Lab Thực Hành</div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-basic">Lab 7.1 - Cơ bản</div>
+                    <div class="lab-title">Horizontal Pod Autoscaler (HPA) Stress-test</div>
+                    <div class="lab-text">Cài đặt metrics-server. Cấu hình HPA cho ứng dụng Nginx: Nếu CPU > 50%, tự động nhân bản hệ thống từ 3 Pod lên tối đa 10 Pod. Chạy công cụ stress-test để chứng kiến hệ thống tự đẻ Pod theo thời gian thực.</div>
+                </div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-adv">Lab 7.2 - Nâng cao</div>
+                    <div class="lab-title">Prometheus & Grafana Cluster Monitoring</div>
+                    <div class="lab-text">Triển khai trọn bộ Prometheus & Grafana bằng Helm Chart lên cụm Cluster của bạn để giám sát biểu đồ CPU/RAM/Network của toàn bộ các máy Node Worker.</div>
+                </div>
+            </section>
+
+            <section id="khoi8" class="content-section">
+                <div class="block-header">
+                    <div class="block-title">⬛ KHỐI 8: CI/CD, GITOPS & CLUSTER OPERATIONS</div>
+                </div>
+                <div class="section-subtitle">1. Lý thuyết</div>
+                <div class="theory-box">
+                    <div class="theory-title">Cơ bản (Helm Charts & GitOps)</div>
+                    <div class="theory-desc">Quản lý gói ứng dụng K8s: Sử dụng Helm Chart như một "App Store" để đóng gói toàn bộ file YAML thành một template có thể truyền tham số linh hoạt. Triết lý GitOps: Quản lý trạng thái Cluster bằng Git thông qua các công cụ tự đồng bộ như ArgoCD.</div>
+                </div>
+                <div class="theory-box advanced">
+                    <div class="theory-title">Chuyên sâu (CRD, Operators & Deployment Patterns)</div>
+                    <div class="theory-desc">Cơ chế mở rộng tính năng của K8s thông qua CRD (Custom Resource Definitions) và viết Custom Controllers / Operators. Kỹ thuật triển khai nâng cao trên môi trường Production: Canary Deployments (Chia traffic) và Blue-Green Deployments.</div>
+                </div>
+                <div class="section-subtitle">2. Chuỗi Bài Lab Thực Hành</div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-basic">Lab 8.1 - Cơ bản</div>
+                    <div class="lab-title">Packaging Applications with Helm</div>
+                    <div class="lab-text">Đóng gói dự án WordPress + MySQL của bạn thành một Helm Chart riêng, có khả năng thay đổi cấu hình, mật khẩu dễ dàng qua file values.yaml.</div>
+                </div>
+                <div class="lab-card">
+                    <div class="lab-tag tag-adv">Lab 8.2 - Nâng cao (Trận đánh cuối cùng)</div>
+                    <div class="lab-title">GitOps Continuous Delivery with ArgoCD</div>
+                    <div class="lab-text">Cài đặt ArgoCD, kết nối với Git Repository chứa các file cấu hình YAML. Khi bạn sửa file YAML trên Git (ví dụ nâng số replicas từ 3 lên 5) và push, ArgoCD sẽ tự động đồng bộ hóa cụm K8s theo trạng thái của Git mà không cần gõ lệnh thủ công!</div>
+                </div>
+            </section>
+
+            <div class="roadmap-footer">
+                Học theo Lộ trình chuẩn tương tác tại <a href="https://roadmap.sh" target="_blank" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">roadmap.sh</a>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const menuLinks = document.querySelectorAll('.menu-link');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 1. Gỡ bỏ trạng thái active của toàn bộ các nút menu bên trái
+                menuLinks.forEach(item => item.classList.remove('active'));
+                
+                // 2. Thêm trạng thái active vào nút vừa được ấn
+                this.classList.add('active');
+                
+                // 3. Ẩn toàn bộ các section nội dung bên phải
+                contentSections.forEach(section => section.classList.remove('active'));
+                
+                // 4. Lấy ID mục tiêu thông qua thuộc tính data-target và hiển thị duy nhất nó lên
+                const targetId = this.getAttribute('data-target');
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    // Cuộn nhẹ lên đầu nội dung (hữu ích cho giao diện mobile)
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
